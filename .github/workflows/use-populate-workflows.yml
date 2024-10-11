@@ -32,7 +32,8 @@ jobs:
       matrix:
         repo: ${{ fromJson(needs.read-repos.outputs.repo-list) }}
     steps:
-      - name: Use Populate Workflows Action for ${{ matrix.repo }}
+      - uses: actions/checkout@v4
+      - name: Use Populate Workflows Action
         uses: ./.github/actions/populate-workflows
         with:
           target-repo: ${{ matrix.repo }}
