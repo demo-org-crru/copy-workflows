@@ -1,0 +1,11 @@
+# create a GH workflow that works on manual trigger, and prinsts out "hello world" inthe console
+name: Test
+on:
+  workflow_dispatch:
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Hello world
+            run: echo "Hello world"
+            
