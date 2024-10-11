@@ -1,0 +1,54 @@
+name: 'Populate Workflows'
+description: 'Copies workflows to target repositories.'
+inputs:
+  target-repo:
+    description: 'The name of the target repository (owner/repo).'
+    required: true
+  my-token:
+    description: 'Personal access token with repo access.'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout current repository
+      uses: actions/checkout@v4
+
+    - name: Clone target repository
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.target-repo }}
+        ref: main
+        token: ${{ inputs.my-token }}
+        sparse-checkout: '.github/workflows'
+        persist-credentials: false
+        path: target-repo
+
+    - name: Copy workflows to target repository
+      shell: bash
+      run: |
+        cp -r .github/workflows/my-workflows/* target-repo/.github/workflows/
+
+    - name: Configure Git
+      shell: bash
+      run: |
+        cd target-repo
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+
+    - name: Commit changes
+      shell: bash
+      run: |
+        cd target-repo
+        git add .
+        git commit -m "Populate workflows from source repository" || echo "No changes to commit"
+
+    - name: Push changes
+      shell: bash
+      run: |
+        cd target-repo
+        git push https://${{ inputs.my-token }}@github.com/${{ inputs.target-repo }}.git
+
+    - name: Clean up
+      shell: bash
+      run: |
+        rm -rf target-repo

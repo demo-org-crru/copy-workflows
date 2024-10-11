@@ -1,0 +1,22 @@
+name: Use Populate Workflows Action
+
+on:
+  workflow_dispatch:
+    inputs:
+      target-repo:
+        description: 'The repository to populate workflows in (owner/repo).'
+        required: true
+
+permissions:
+  contents: write  
+  
+jobs:
+  populate-workflows:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Use Populate Workflows Action
+        uses: ./.github/actions/populate-workflows
+        with:
+          target-repo: ${{ github.event.inputs.target-repo }}
+          my-token: ${{ secrets.MY_TOKEN }}
