@@ -28,12 +28,10 @@ jobs:
     - name: Check if target repository has .github/workflows folder
       run: |
         url="https://github.com/${{ github.repository_owner }}/${{ env.TARGET_REPO }}/tree/main/.github/workflows"
-        if curl --head --silent --fail "$url" > /dev/null; then
-          echo ".github/workflows folder exists in the target repository."
-        else
-          echo "The target repository does not have a .github/workflows folder."
-          exit 1
-        fi
+        status_code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+        if [ $status_code -ne 200]
+        
+
 
     # - name: Clone target repository
     #   uses: actions/checkout@v4

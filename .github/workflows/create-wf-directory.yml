@@ -1,0 +1,42 @@
+name: Create Directory in Target Repositories
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write  # Allows pushing to the repository
+
+jobs:
+  create-directory:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repo:
+          - 'crru-jira-to-ado'
+
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.repo }}
+          token: ${{ secrets.MY_TOKEN }}
+          ref: main
+
+      - name: Create directory and placeholder file
+        run: |
+          mkdir -p .github/workflows
+          touch .github/workflows/.gitkeep
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+      
+      - name: Commit changes
+        run: |
+          git add .github/workflows/.gitkeep
+          git commit -m "Create .github/workflows directory with placeholder file" || echo "No changes to commit"
+
+      - name: Push changes
+        run: |
+          git push origin HEAD:main
