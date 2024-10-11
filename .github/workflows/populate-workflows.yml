@@ -60,12 +60,10 @@ jobs:
         git add .
         git commit -m "Populate workflows from source repository"
 
-    - name: Push changes
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Push changes      
       run: |
         cd target-repo
-        git push https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository_owner }}/${{ env.TARGET_REPO }}
+        git push https://${{ secrets.MY_TOKEN }}@github.com/${{ github.repository_owner }}/${{ env.TARGET_REPO }}
 
     - name: Clean up
       run: |
