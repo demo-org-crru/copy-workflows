@@ -2,22 +2,38 @@ name: Use Populate Workflows Action
 
 on:
   workflow_dispatch:
-    inputs:
-      target-repo:
-        description: 'The repository to populate workflows in (owner/repo).'
-        required: true
 
 permissions:
-  contents: write  
-  
-jobs:
-  populate-workflows:
-    runs-on: ubuntu-latest
+  contents: write
 
+jobs:
+  # Job to read the repository list from the file
+  read-repos:
+    runs-on: ubuntu-latest
+    outputs:
+      repo-list: ${{ steps.get-repos.outputs.repo-list }}
     steps:
-     - uses: actions/checkout@v4
-     - name: Use Populate Workflows Action
-       uses: ./.github/actions/populate-workflows
-       with:
-         target-repo: ${{ github.event.inputs.target-repo }}
-         my-token: ${{ secrets.MY_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read repository list
+        id: get-repos
+        shell: bash
+        run: |
+          repos=$(cat target-repos.txt | jq -R -s 'split("\n") | map(select(length > 0))')
+          echo "Repository list: $repos"
+          echo "repo-list=$repos" >> $GITHUB_OUTPUT
+
+  # Job to populate workflows using the repository list
+  populate-workflows:
+    needs: read-repos
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repo: ${{ fromJson(needs.read-repos.outputs.repo-list) }}
+    steps:
+      - name: Use Populate Workflows Action for ${{ matrix.repo }}
+        uses: ./.github/actions/populate-workflows
+        with:
+          target-repo: ${{ matrix.repo }}
+          my-token: ${{ secrets.MY_TOKEN }}
