@@ -25,38 +25,51 @@ jobs:
       id: vars
       run: echo "TARGET_REPO=${{ github.event.inputs['target-repo'] }}" >> $GITHUB_ENV
 
-    - name: Clone target repository
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ github.repository_owner }}/${{ env.TARGET_REPO }}
-        ref: main        
-        token: ${{ secrets.MY_TOKEN }}
-        persist-credentials: false
-        path: target-repo
-
-    - name: Check if .github/workflows directory exists in target repository
+    - name: Check if target repository has .github/workflows folder
       run: |
-        if [ ! -d "target-repo/.github/workflows" ]; then
-          mkdir -p target-repo/.github/workflows
+        url="https://github.com/${{ github.repository_owner }}/${{ env.TARGET_REPO }}/tree/main/.github/workflows"
+        if curl --head --silent --fail "$url" > /dev/null; then
+          echo ".github/workflows folder exists in the target repository."
+        else
+          echo "The target repository does not have a .github/workflows folder."
+          exit 1
         fi
 
-    - name: Copy workflows to target repository
-      run: |
-        cp -r .github/workflows/my-workflows/* target-repo/.github/workflows/
+    # - name: Clone target repository
+    #   uses: actions/checkout@v4
+    #   with:
+    #     repository: ${{ github.repository_owner }}/${{ env.TARGET_REPO }}
+    #     ref: main        
+    #     token: ${{ secrets.MY_TOKEN }}
+    #     # sparse-checkout: '.github/workflows'
+    #     persist-credentials: false
+    #     path: target-repo
 
-    - name: Commit changes
-      run: |
-        cd target-repo
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
-        git add .
-        git commit -m "Populate workflows from source repository"
+    
 
-    - name: Push changes      
-      run: |
-        cd target-repo
-        git push https://${{ secrets.MY_TOKEN }}@github.com/${{ github.repository_owner }}/${{ env.TARGET_REPO }}
+    # - name: Check if .github/workflows directory exists in target repository
+    #   run: |
+    #     if [ ! -d "target-repo/.github/workflows" ]; then
+    #       mkdir -p target-repo/.github/workflows
+    #     fi
 
-    - name: Clean up
-      run: |
-        rm -rf target-repo
+    # - name: Copy workflows to target repository
+    #   run: |
+    #     cp -r .github/workflows/my-workflows/* target-repo/.github/workflows/
+
+    # - name: Commit changes
+    #   run: |
+    #     cd target-repo
+    #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
+    #     git config --global user.name "github-actions[bot]"
+    #     git add .
+    #     git commit -m "Populate workflows from source repository"
+
+    # - name: Push changes      
+    #   run: |
+    #     cd target-repo
+    #     git push https://${{ secrets.MY_TOKEN }}@github.com/${{ github.repository_owner }}/${{ env.TARGET_REPO }}
+
+    # - name: Clean up
+    #   run: |
+    #     rm -rf target-repo
