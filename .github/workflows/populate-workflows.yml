@@ -15,7 +15,7 @@ jobs:
 
     steps:
     - name: Checkout current repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Get target repository name
       id: vars
@@ -23,7 +23,7 @@ jobs:
 
     - name: Clone target repository
       run: |
-        git clone https://github.com/${{ github.repository_owner }}/${{ env.TARGET_REPO }} target-repo
+        git clone https://${{ github.token }}@github.com/${{ github.repository_owner }}/${{ env.TARGET_REPO }} target-repo
 
     - name: Check if .github/workflows directory exists in target repository
       run: |
