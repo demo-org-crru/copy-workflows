@@ -1,4 +1,4 @@
-name: Use Populate Workflows Action
+name: Populate Workflows
 
 on:
   workflow_dispatch:
