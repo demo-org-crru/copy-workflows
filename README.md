@@ -1,2 +1,2 @@
 # crru-demos
-A repository to showcase and demonstrate some diverse GH features. 
+A repository for demos and testing.

@@ -21,6 +21,7 @@ jobs:
         shell: bash
         run: |
           repos=$(cat target-repos.txt | jq -R -s --arg org "${{ github.repository_owner }}" 'split("\n") | map(select(length > 0) | "\($org)/\(.)")')
+          repos=$(echo $repos | jq -c .)  # Ensure the JSON array is compact
           echo "Repository list: $repos"
           echo "repo-list=$repos" >> $GITHUB_OUTPUT
 
